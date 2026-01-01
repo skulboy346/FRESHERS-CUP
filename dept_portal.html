@@ -72,7 +72,7 @@
         const firebaseConfig = { apiKey: "AIzaSyDpkYhtnx7163HgP7IaSy0Uy5lz9DCO-0A", authDomain: "freshers-cup-2026.firebaseapp.com", projectId: "freshers-cup-2026", storageBucket: "freshers-cup-2026.firebasestorage.app", messagingSenderId: "926375023026", appId: "1:926375023026:web:d1ad62dede7425900354ab", measurementId: "G-Z53G2Y9BTM" };
         const app = initializeApp(firebaseConfig); const db = getFirestore(app);
 
-        // Hashed Access Codes (Hidden)
+        // Hashed Access Codes
         const validHashes = {
             "AESA": "QUVTQS0yNg==", "NAAES": "TkFBRVMtMjY=", "EFSA": "RUZTQS0yNg==",
             "EMSA": "RU1TQS0yNg==", "HKHE": "SEtHRS0yNg==", "ULSESA": "VUxTRVNBLTI2",
@@ -95,7 +95,6 @@
             e.preventDefault(); const dept = document.getElementById('auth-dept').value; const code = document.getElementById('auth-code').value.trim().toUpperCase(); const btn = document.getElementById('auth-btn');
             if (!dept) return alert("Please select your department."); 
             
-            // Check Hash
             if (btoa(code) !== validHashes[dept]) return alert("❌ Invalid Access Code.");
 
             btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> VERIFYING...';

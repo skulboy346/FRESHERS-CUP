@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Master Admin - Freshers Cup '26</title>
-    
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
@@ -31,7 +30,7 @@
         <div class="bg-gray-900 p-8 rounded-2xl border border-gray-700 shadow-2xl text-center max-w-sm w-full">
             <i class="fa-solid fa-lock text-4xl text-orange-500 mb-4"></i>
             <h2 class="text-2xl font-bold text-white mb-6">ADMIN ACCESS</h2>
-            <form onsubmit="checkLogin(event)">
+            <form id="login-form">
                 <input type="password" id="admin-pass" class="input-dark mb-4 text-center tracking-widest" placeholder="Authenticate">
                 <button type="submit" class="w-full bg-orange-600 hover:bg-orange-700 text-white font-bold py-3 rounded transition">UNLOCK</button>
             </form>
@@ -173,15 +172,14 @@
         const app = initializeApp(firebaseConfig); const db = getFirestore(app);
         const CLOUD_NAME = "dxdxgrvvb"; const UPLOAD_PRESET = "edu_league"; 
 
-        window.checkLogin = (e) => {
+        document.getElementById('login-form').addEventListener('submit', (e) => {
             e.preventDefault(); const p = document.getElementById('admin-pass').value;
-            // Base64 hash of EDUFRESHER26 is RURVRlJFU0hFUjI2. This obscures it from casual view.
             if(btoa(p) === "RURVRlJFU0hFUjI2") {
                 document.getElementById('login-overlay').classList.add('hidden');
                 document.getElementById('admin-content').classList.remove('hidden');
                 init();
             } else { alert("ACCESS DENIED"); }
-        };
+        });
 
         const depts = [ {id:"AESA",name:"AESA"}, {id:"NAAES",name:"NAAES"}, {id:"EFSA",name:"EFSA"}, {id:"EMSA",name:"EMSA"}, {id:"HKHE",name:"HKHE"}, {id:"ULSESA",name:"ULSESA"}, {id:"SESSA",name:"SESSA"}, {id:"TVESA",name:"TVESA"} ];
         let allFixtures = []; let brandLogos = {};
@@ -246,6 +244,7 @@
         window.saveSettings = async () => { await setDoc(doc(db,"app_content","fc_settings"), { countdownTarget: document.getElementById('countdown-date').value }, {merge:true}); alert("Saved"); checkDateStatus(); }
         async function loadSettings() { const s = await getDoc(doc(db,"app_content","fc_settings")); if(s.exists() && s.data().countdownTarget) { document.getElementById('countdown-date').value = s.data().countdownTarget; checkDateStatus(); } }
         
+        init();
     </script>
 </body>
 </html>
