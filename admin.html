@@ -7,73 +7,86 @@
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
+    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
     <script src="https://upload-widget.cloudinary.com/global/all.js" type="text/javascript"></script>
 
     <style>
-        body { font-family: 'Rajdhani', sans-serif; background-color: #0f172a; color: white; }
-        .input-dark { background: #020617; border: 1px solid #1e293b; padding: 10px; color: white; border-radius: 6px; width: 100%; outline: none; }
-        .input-dark:focus { border-color: #f97316; }
+        body { font-family: 'Rajdhani', sans-serif; background-color: #000; color: white; }
+        .font-cyber { font-family: 'Orbitron', sans-serif; }
+        .glass-panel { background: rgba(17, 24, 39, 0.95); backdrop-filter: blur(12px); border: 1px solid rgba(249, 115, 22, 0.3); box-shadow: 0 0 20px rgba(0,0,0,0.5); }
+        .input-fire { background: rgba(0,0,0,0.6); border: 1px solid #333; color: white; transition: all 0.3s ease; padding: 12px; border-radius: 8px; width: 100%; outline: none; }
+        .input-fire:focus { border-color: #f97316; box-shadow: 0 0 15px rgba(245, 158, 11, 0.3); }
+        
+        /* White Calendar Icon Fix */
         input[type="datetime-local"]::-webkit-calendar-picker-indicator { filter: invert(1); cursor: pointer; }
+
+        /* Tabs */
         .tab-btn { transition: all 0.3s; opacity: 0.6; border-bottom: 3px solid transparent; }
         .tab-btn:hover { opacity: 1; background: rgba(255,255,255,0.05); }
         .tab-btn.active { opacity: 1; border-bottom-color: #f97316; color: #f97316; background: rgba(249, 115, 22, 0.1); }
-        .section { animation: fadeIn 0.3s ease-in-out; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
-        .no-scrollbar::-webkit-scrollbar { display: none; }
         
-        /* Full Screen Overlay */
-        #login-overlay { position: fixed; inset: 0; background: #020617; z-index: 9999; display: flex; align-items: center; justify-content: center; }
+        .fade-in { animation: fadeIn 0.5s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .hidden { display: none; }
     </style>
 </head>
-<body class="p-6 max-w-7xl mx-auto mb-20">
+<body class="min-h-screen flex flex-col items-center justify-center p-4 bg-[url('https://images.unsplash.com/photo-1517466787929-bc90951d0974?q=80&w=2000')] bg-cover bg-center bg-fixed">
 
-    <div id="login-overlay">
-        <div class="bg-gray-900 p-8 rounded-2xl border border-gray-700 shadow-2xl text-center max-w-sm w-full">
-            <i class="fa-solid fa-lock text-4xl text-orange-500 mb-4"></i>
-            <h2 class="text-2xl font-bold text-white mb-6">ADMIN ACCESS</h2>
-            
-            <div class="space-y-4">
-                <input type="password" id="pass-input" class="input-dark text-center tracking-widest text-lg" placeholder="Enter Code">
-                
-                <button onclick="attemptUnlock()" class="w-full bg-orange-600 hover:bg-orange-700 text-white font-bold py-3 rounded transition shadow-lg text-lg">UNLOCK</button>
+    <div class="absolute inset-0 bg-black/90 z-0"></div>
+
+    <div id="auth-box" class="relative z-10 glass-panel p-8 rounded-2xl w-full max-w-sm text-center fade-in">
+        <div class="mb-6">
+            <i class="fa-solid fa-lock text-5xl text-orange-500 mb-2 drop-shadow-lg"></i>
+            <h1 class="text-3xl font-black font-cyber italic tracking-wider">MASTER <span class="text-orange-500">ADMIN</span></h1>
+        </div>
+        
+        <div class="space-y-4">
+            <div class="text-left">
+                <label class="text-[10px] font-bold text-gray-400 uppercase ml-1">Admin Password</label>
+                <input id="admin-pass" type="password" class="input-fire text-center text-lg font-bold tracking-widest placeholder-gray-600" placeholder="••••••••">
             </div>
-            
-            <p id="error-msg" class="text-red-500 font-bold mt-4 hidden">❌ WRONG PASSWORD</p>
+            <button onclick="handleAdminLogin()" class="w-full bg-gradient-to-r from-orange-600 to-red-600 text-white font-black py-4 rounded-xl text-lg hover:scale-[1.02] transition shadow-lg mt-2">
+                ACCESS SYSTEM
+            </button>
+            <p id="login-msg" class="text-red-500 font-bold text-sm hidden animate-pulse">❌ ACCESS DENIED</p>
         </div>
     </div>
 
-    <div id="admin-content" class="hidden">
+    <div id="dashboard" class="relative z-10 w-full max-w-7xl hidden fade-in mt-10 mb-20">
         
-        <div class="flex justify-between items-center mb-8 border-b border-gray-700 pb-4">
-            <h1 class="text-3xl font-bold text-orange-500">MASTER <span class="text-white">CONTROL</span></h1>
-            <div class="text-xs text-gray-400">Total Players: <span id="total-count" class="text-green-400 font-bold text-lg">0</span></div>
+        <div class="glass-panel p-6 rounded-xl mb-6 flex justify-between items-center">
+            <div>
+                <h1 class="text-2xl font-black font-cyber text-white">CONTROL PANEL</h1>
+                <p class="text-xs text-gray-400">Total Players: <span id="total-count" class="text-green-400 font-bold">0</span></p>
+            </div>
+            <button onclick="location.reload()" class="bg-red-900/50 text-red-200 px-4 py-2 rounded border border-red-700 hover:bg-red-900 transition text-xs font-bold">LOGOUT</button>
         </div>
 
-        <div class="flex gap-1 mb-6 overflow-x-auto pb-2 border-b border-gray-800">
-            <button onclick="switchTab('overview')" id="btn-overview" class="tab-btn active px-4 py-3 font-bold text-sm tracking-widest">OVERVIEW</button>
-            <button onclick="switchTab('fixtures')" id="btn-fixtures" class="tab-btn px-4 py-3 font-bold text-sm tracking-widest">FIXTURES</button>
-            <button onclick="switchTab('draws')" id="btn-draws" class="tab-btn px-4 py-3 font-bold text-sm tracking-widest text-cyan-400">DRAWS</button>
-            <button onclick="switchTab('scores')" id="btn-scores" class="tab-btn px-4 py-3 font-bold text-sm tracking-widest">SCORES</button>
-            <button onclick="switchTab('medals')" id="btn-medals" class="tab-btn px-4 py-3 font-bold text-sm tracking-widest text-yellow-500">MEDALS</button>
-            <button onclick="switchTab('logos')" id="btn-logos" class="tab-btn px-4 py-3 font-bold text-sm tracking-widest text-purple-400">LOGOS</button>
-            <button onclick="switchTab('partners')" id="btn-partners" class="tab-btn px-4 py-3 font-bold text-sm tracking-widest">PARTNERS</button>
-            <button onclick="switchTab('settings')" id="btn-settings" class="tab-btn px-4 py-3 font-bold text-sm tracking-widest">SETTINGS</button>
+        <div class="flex gap-2 mb-6 overflow-x-auto pb-2">
+            <button onclick="switchTab('overview')" id="btn-overview" class="tab-btn active px-6 py-3 rounded-lg font-bold text-sm bg-gray-900 border border-gray-700 text-white">OVERVIEW</button>
+            <button onclick="switchTab('fixtures')" id="btn-fixtures" class="tab-btn px-6 py-3 rounded-lg font-bold text-sm bg-gray-900 border border-gray-700 text-white">FIXTURES</button>
+            <button onclick="switchTab('draws')" id="btn-draws" class="tab-btn px-6 py-3 rounded-lg font-bold text-sm bg-gray-900 border border-gray-700 text-cyan-400">DRAWS</button>
+            <button onclick="switchTab('scores')" id="btn-scores" class="tab-btn px-6 py-3 rounded-lg font-bold text-sm bg-gray-900 border border-gray-700 text-white">SCORES</button>
+            <button onclick="switchTab('medals')" id="btn-medals" class="tab-btn px-6 py-3 rounded-lg font-bold text-sm bg-gray-900 border border-gray-700 text-yellow-500">MEDALS</button>
+            <button onclick="switchTab('logos')" id="btn-logos" class="tab-btn px-6 py-3 rounded-lg font-bold text-sm bg-gray-900 border border-gray-700 text-purple-400">LOGOS</button>
+            <button onclick="switchTab('partners')" id="btn-partners" class="tab-btn px-6 py-3 rounded-lg font-bold text-sm bg-gray-900 border border-gray-700 text-white">PARTNERS</button>
+            <button onclick="switchTab('settings')" id="btn-settings" class="tab-btn px-6 py-3 rounded-lg font-bold text-sm bg-gray-900 border border-gray-700 text-white">SETTINGS</button>
         </div>
 
         <div id="tab-overview" class="section">
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                <div class="bg-gray-800 p-6 rounded-xl border border-gray-700 h-fit">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div class="glass-panel p-6 rounded-xl">
                     <h2 class="text-xl font-bold text-blue-400 mb-4">DEPARTMENT LINKS</h2>
                     <div id="dept-list" class="space-y-2"></div>
                 </div>
-                <div class="bg-gray-800 p-6 rounded-xl border border-gray-700 flex flex-col h-[600px]">
+                <div class="glass-panel p-6 rounded-xl flex flex-col h-[500px]">
                     <h2 class="text-xl font-bold text-green-400 mb-4">INVITE MANAGER</h2>
                     <div class="space-y-2 mb-3">
-                        <input id="wa-group-link" type="text" placeholder="1. Paste Group Link..." class="input-dark border-green-900">
-                        <input id="wa-channel-link" type="text" placeholder="2. Paste Channel Link..." class="input-dark border-blue-900">
+                        <input id="wa-group-link" type="text" placeholder="1. Paste Group Link..." class="input-fire border-green-900">
+                        <input id="wa-channel-link" type="text" placeholder="2. Paste Channel Link..." class="input-fire border-blue-900">
                     </div>
                     <div id="invite-list" class="flex-grow overflow-y-auto pr-2 space-y-2"></div>
                 </div>
@@ -83,17 +96,17 @@
         <div id="tab-fixtures" class="section hidden">
             <div class="flex justify-end mb-4"><button onclick="downloadFixturesPDF()" class="bg-white text-black px-4 py-2 rounded font-bold text-xs hover:bg-gray-200 transition">Download PDF</button></div>
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <div class="bg-gray-800 p-6 rounded-xl border border-orange-500/30 h-fit">
+                <div class="glass-panel p-6 rounded-xl h-fit">
                     <h3 class="font-bold text-white mb-4 border-b border-gray-700 pb-2">CREATE FIXTURE</h3>
                     <div class="space-y-3">
-                        <select id="fix-sport" class="input-dark"><option value="Football">Football</option><option value="Futsal">Futsal</option><option value="Chess">Chess</option><option value="Scrabble">Scrabble</option><option value="Ludo">Ludo</option><option value="Ayo">Ayo</option></select>
-                        <select id="fix-stage" class="input-dark"><option value="Group Stage">Group Stage</option><option value="Quarter Final">Quarter Final</option><option value="Semi Final">Semi Final</option><option value="Final">Final</option></select>
-                        <div class="grid grid-cols-2 gap-2"><select id="fix-teamA" class="input-dark team-select text-orange-400"><option value="">Home</option></select><select id="fix-teamB" class="input-dark team-select text-blue-400"><option value="">Away</option></select></div>
-                        <input type="datetime-local" id="fix-date" class="input-dark"><input type="text" id="fix-venue" placeholder="Venue" class="input-dark">
+                        <select id="fix-sport" class="input-fire"><option value="Football">Football</option><option value="Futsal">Futsal</option><option value="Chess">Chess</option><option value="Scrabble">Scrabble</option><option value="Ludo">Ludo</option><option value="Ayo">Ayo</option></select>
+                        <select id="fix-stage" class="input-fire"><option value="Group Stage">Group Stage</option><option value="Quarter Final">Quarter Final</option><option value="Semi Final">Semi Final</option><option value="Final">Final</option></select>
+                        <div class="grid grid-cols-2 gap-2"><select id="fix-teamA" class="input-fire team-select text-orange-400"><option value="">Home</option></select><select id="fix-teamB" class="input-fire team-select text-blue-400"><option value="">Away</option></select></div>
+                        <input type="datetime-local" id="fix-date" class="input-fire"><input type="text" id="fix-venue" placeholder="Venue" class="input-fire">
                         <button onclick="addFixture()" class="w-full bg-orange-600 hover:bg-orange-700 text-white font-bold py-3 rounded">PUBLISH MATCH</button>
                     </div>
                 </div>
-                <div class="lg:col-span-2 bg-gray-800 p-6 rounded-xl border border-gray-700">
+                <div class="lg:col-span-2 glass-panel p-6 rounded-xl">
                     <div class="flex justify-between items-center mb-4"><h3 class="font-bold text-white">UPCOMING MATCHES</h3><button onclick="loadFixtures()" class="text-xs text-orange-400">REFRESH</button></div>
                     <div id="fixture-list" class="space-y-2"></div>
                 </div>
@@ -101,51 +114,45 @@
         </div>
 
         <div id="tab-draws" class="section hidden">
-            <div class="bg-gray-800 p-6 rounded-xl border border-cyan-500/30">
+            <div class="glass-panel p-6 rounded-xl border border-cyan-500/30">
                 <div class="flex justify-between items-center mb-6 border-b border-gray-700 pb-4">
-                    <h3 class="text-xl font-bold text-white flex items-center gap-2"><i class="fa-solid fa-sitemap text-cyan-400"></i> TOURNAMENT BRACKET SETUP</h3>
+                    <h3 class="text-xl font-bold text-white flex items-center gap-2"><i class="fa-solid fa-sitemap text-cyan-400"></i> TOURNAMENT BRACKET</h3>
                     <select id="draw-sport" class="bg-black text-white px-4 py-2 rounded border border-cyan-600 font-bold" onchange="loadDraws()">
                         <option value="Football">Football</option><option value="Futsal">Futsal</option><option value="Chess">Chess</option><option value="Scrabble">Scrabble</option><option value="Ludo">Ludo</option><option value="Ayo">Ayo</option>
                     </select>
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-                    <div class="bg-black p-4 rounded border border-gray-700"><h4 class="text-xs font-bold text-gray-400 mb-2">GROUP A</h4><select id="grp-a1" class="input-dark mb-2 team-select"><option value="">-- Team 1 --</option></select><select id="grp-a2" class="input-dark team-select"><option value="">-- Team 2 --</option></select></div>
-                    <div class="bg-black p-4 rounded border border-gray-700"><h4 class="text-xs font-bold text-gray-400 mb-2">GROUP B</h4><select id="grp-b1" class="input-dark mb-2 team-select"><option value="">-- Team 1 --</option></select><select id="grp-b2" class="input-dark team-select"><option value="">-- Team 2 --</option></select></div>
-                    <div class="bg-black p-4 rounded border border-gray-700"><h4 class="text-xs font-bold text-gray-400 mb-2">GROUP C</h4><select id="grp-c1" class="input-dark mb-2 team-select"><option value="">-- Team 1 --</option></select><select id="grp-c2" class="input-dark team-select"><option value="">-- Team 2 --</option></select></div>
-                    <div class="bg-black p-4 rounded border border-gray-700"><h4 class="text-xs font-bold text-gray-400 mb-2">GROUP D</h4><select id="grp-d1" class="input-dark mb-2 team-select"><option value="">-- Team 1 --</option></select><select id="grp-d2" class="input-dark team-select"><option value="">-- Team 2 --</option></select></div>
+                    <div class="bg-black/50 p-4 rounded border border-gray-700"><h4 class="text-xs font-bold text-gray-400 mb-2">GROUP A</h4><select id="grp-a1" class="input-fire mb-2 team-select"><option value="">-- Team 1 --</option></select><select id="grp-a2" class="input-fire team-select"><option value="">-- Team 2 --</option></select></div>
+                    <div class="bg-black/50 p-4 rounded border border-gray-700"><h4 class="text-xs font-bold text-gray-400 mb-2">GROUP B</h4><select id="grp-b1" class="input-fire mb-2 team-select"><option value="">-- Team 1 --</option></select><select id="grp-b2" class="input-fire team-select"><option value="">-- Team 2 --</option></select></div>
+                    <div class="bg-black/50 p-4 rounded border border-gray-700"><h4 class="text-xs font-bold text-gray-400 mb-2">GROUP C</h4><select id="grp-c1" class="input-fire mb-2 team-select"><option value="">-- Team 1 --</option></select><select id="grp-c2" class="input-fire team-select"><option value="">-- Team 2 --</option></select></div>
+                    <div class="bg-black/50 p-4 rounded border border-gray-700"><h4 class="text-xs font-bold text-gray-400 mb-2">GROUP D</h4><select id="grp-d1" class="input-fire mb-2 team-select"><option value="">-- Team 1 --</option></select><select id="grp-d2" class="input-fire team-select"><option value="">-- Team 2 --</option></select></div>
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8 pt-6 border-t border-gray-700">
-                    <div>
-                        <h4 class="text-sm font-bold text-cyan-400 mb-4 text-center">SEMI FINALS</h4>
-                        <div class="space-y-4">
-                            <div class="bg-black p-3 rounded flex items-center justify-between gap-2 border border-cyan-900/50"><span class="text-xs text-gray-500 font-bold">SF 1</span><select id="sf1-h" class="input-dark w-32 team-select text-center"><option value="Winner A">Winner A</option></select><span class="font-bold text-white">VS</span><select id="sf1-a" class="input-dark w-32 team-select text-center"><option value="Winner C">Winner C</option></select></div>
-                            <div class="bg-black p-3 rounded flex items-center justify-between gap-2 border border-cyan-900/50"><span class="text-xs text-gray-500 font-bold">SF 2</span><select id="sf2-h" class="input-dark w-32 team-select text-center"><option value="Winner B">Winner B</option></select><span class="font-bold text-white">VS</span><select id="sf2-a" class="input-dark w-32 team-select text-center"><option value="Winner D">Winner D</option></select></div>
-                        </div>
-                    </div>
-                    <div><h4 class="text-sm font-bold text-yellow-500 mb-4 text-center">GRAND FINAL</h4><div class="bg-gradient-to-r from-yellow-900/20 to-orange-900/20 p-6 rounded border border-yellow-600/30 flex items-center justify-center gap-4 mt-2"><select id="fin-h" class="input-dark w-40 team-select text-center font-bold text-lg"><option value="?">TBD</option></select><span class="font-black text-2xl text-yellow-600">VS</span><select id="fin-a" class="input-dark w-40 team-select text-center font-bold text-lg"><option value="?">TBD</option></select></div></div>
+                    <div><h4 class="text-sm font-bold text-cyan-400 mb-4 text-center">SEMI FINALS</h4><div class="space-y-4"><div class="bg-black/50 p-3 rounded flex items-center justify-between gap-2 border border-cyan-900/50"><span class="text-xs text-gray-500 font-bold">SF 1</span><select id="sf1-h" class="input-fire w-32 team-select text-center"><option value="Winner A">Winner A</option></select><span class="font-bold text-white">VS</span><select id="sf1-a" class="input-fire w-32 team-select text-center"><option value="Winner C">Winner C</option></select></div><div class="bg-black/50 p-3 rounded flex items-center justify-between gap-2 border border-cyan-900/50"><span class="text-xs text-gray-500 font-bold">SF 2</span><select id="sf2-h" class="input-fire w-32 team-select text-center"><option value="Winner B">Winner B</option></select><span class="font-bold text-white">VS</span><select id="sf2-a" class="input-fire w-32 team-select text-center"><option value="Winner D">Winner D</option></select></div></div></div>
+                    <div><h4 class="text-sm font-bold text-yellow-500 mb-4 text-center">GRAND FINAL</h4><div class="bg-gradient-to-r from-yellow-900/20 to-orange-900/20 p-6 rounded border border-yellow-600/30 flex items-center justify-center gap-4 mt-2"><select id="fin-h" class="input-fire w-40 team-select text-center font-bold text-lg"><option value="?">TBD</option></select><span class="font-black text-2xl text-yellow-600">VS</span><select id="fin-a" class="input-fire w-40 team-select text-center font-bold text-lg"><option value="?">TBD</option></select></div></div>
                 </div>
-                <button onclick="saveDraws()" class="mt-8 w-full bg-cyan-600 hover:bg-cyan-700 text-white font-bold py-4 rounded shadow-lg">SAVE BRACKET DATA</button>
+                <button onclick="saveDraws()" class="mt-8 w-full bg-cyan-600 hover:bg-cyan-700 text-white font-bold py-4 rounded shadow-lg transition transform hover:scale-[1.01]">SAVE BRACKET DATA</button>
             </div>
         </div>
 
         <div id="tab-scores" class="section hidden">
             <div class="flex justify-between items-center mb-4"><h3 class="font-bold text-white">UPDATE RESULTS</h3><button onclick="downloadResultsPDF()" class="bg-white text-black px-4 py-2 rounded font-bold text-xs hover:bg-gray-200 transition">Download PDF</button></div>
-            <div class="bg-gray-800 p-6 rounded-xl border border-gray-700"><div id="score-list" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div></div>
+            <div class="glass-panel p-6 rounded-xl"><div id="score-list" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div></div>
         </div>
 
         <div id="tab-medals" class="section hidden">
-            <div class="bg-gray-800 p-6 rounded-xl border border-gray-700">
-                <div class="flex justify-between items-center mb-6"><h3 class="text-xl font-bold text-white flex items-center gap-2"><i class="fa-solid fa-medal text-yellow-500"></i> MEDAL STANDINGS</h3><button onclick="saveMedals()" class="bg-green-600 hover:bg-green-500 text-white px-6 py-2 rounded font-bold transition">SAVE</button></div>
+            <div class="glass-panel p-6 rounded-xl">
+                <div class="flex justify-between items-center mb-6"><h3 class="text-xl font-bold text-white flex items-center gap-2"><i class="fa-solid fa-medal text-yellow-500"></i> MEDAL STANDINGS</h3><button onclick="saveMedals()" class="bg-green-600 hover:bg-green-500 text-white px-6 py-2 rounded font-bold transition shadow-lg animate-pulse">SAVE</button></div>
                 <div class="overflow-x-auto"><table class="w-full text-left text-sm text-gray-300"><thead class="bg-black text-orange-500 uppercase text-xs"><tr><th class="p-3">Dept</th><th class="p-3 text-center text-yellow-400">🥇</th><th class="p-3 text-center text-gray-300">🥈</th><th class="p-3 text-center text-orange-700">🥉</th></tr></thead><tbody id="medal-table-body" class="divide-y divide-gray-700"></tbody></table></div>
             </div>
         </div>
 
         <div id="tab-logos" class="section hidden">
-            <div class="bg-gray-800 p-6 rounded-xl border border-purple-500/30">
+            <div class="glass-panel p-6 rounded-xl border border-purple-500/30">
                 <h3 class="font-bold text-white mb-4 flex items-center gap-2 text-xl border-b border-gray-700 pb-2"><i class="fa-solid fa-star text-yellow-500"></i> SYSTEM IDENTITY</h3>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                    <div class="bg-black p-4 rounded-xl border border-yellow-500/30 flex flex-col items-center"><img id="img-nuesa_logo" src="edulogo.jpg" class="h-20 w-20 object-contain mb-3 bg-white/10 rounded p-1"><p class="text-sm font-bold text-yellow-500 mb-2">NUESA LOGO</p><input type="file" id="file-nuesa_logo" class="hidden" accept="image/*" onchange="uploadLogo('nuesa_logo', 'brand_logos')"><label for="file-nuesa_logo" class="bg-gray-700 hover:bg-gray-600 text-white text-xs font-bold px-4 py-2 rounded cursor-pointer">UPLOAD NUESA</label></div>
-                    <div class="bg-black p-4 rounded-xl border border-orange-500/30 flex flex-col items-center"><img id="img-freshers_logo" src="edulogo.jpg" class="h-20 w-20 object-contain mb-3 bg-white/10 rounded p-1"><p class="text-sm font-bold text-orange-500 mb-2">FRESHERS CUP LOGO</p><input type="file" id="file-freshers_logo" class="hidden" accept="image/*" onchange="uploadLogo('freshers_logo', 'brand_logos')"><label for="file-freshers_logo" class="bg-gray-700 hover:bg-gray-600 text-white text-xs font-bold px-4 py-2 rounded cursor-pointer">UPLOAD FRESHERS</label></div>
+                    <div class="bg-black/50 p-4 rounded-xl border border-yellow-500/30 flex flex-col items-center"><img id="img-nuesa_logo" src="edulogo.jpg" class="h-20 w-20 object-contain mb-3 bg-white/10 rounded p-1"><p class="text-sm font-bold text-yellow-500 mb-2">NUESA LOGO</p><input type="file" id="file-nuesa_logo" class="hidden" accept="image/*" onchange="uploadLogo('nuesa_logo', 'brand_logos')"><label for="file-nuesa_logo" class="bg-gray-700 hover:bg-gray-600 text-white text-xs font-bold px-4 py-2 rounded cursor-pointer">UPLOAD NUESA</label></div>
+                    <div class="bg-black/50 p-4 rounded-xl border border-orange-500/30 flex flex-col items-center"><img id="img-freshers_logo" src="edulogo.jpg" class="h-20 w-20 object-contain mb-3 bg-white/10 rounded p-1"><p class="text-sm font-bold text-orange-500 mb-2">FRESHERS CUP LOGO</p><input type="file" id="file-freshers_logo" class="hidden" accept="image/*" onchange="uploadLogo('freshers_logo', 'brand_logos')"><label for="file-freshers_logo" class="bg-gray-700 hover:bg-gray-600 text-white text-xs font-bold px-4 py-2 rounded cursor-pointer">UPLOAD FRESHERS</label></div>
                 </div>
                 <h3 class="font-bold text-white mb-6 flex items-center gap-2 text-xl border-b border-gray-700 pb-2"><i class="fa-solid fa-users text-purple-500"></i> DEPARTMENT LOGOS</h3>
                 <div id="logo-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4"></div>
@@ -154,19 +161,19 @@
 
         <div id="tab-partners" class="section hidden">
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <div class="bg-gray-800 p-6 rounded-xl h-fit">
+                <div class="glass-panel p-6 rounded-xl h-fit">
                     <h3 class="font-bold text-white mb-4">ADD SPONSOR</h3>
-                    <div class="space-y-3"><input id="partner-name" placeholder="Name" class="input-dark"><input id="partner-link" placeholder="Link" class="input-dark"><select id="partner-type" class="input-dark"><option value="Sponsor">Sponsor</option><option value="Partner">Partner</option></select><input type="file" id="partner-logo" class="input-dark text-xs"><button onclick="addPartner()" id="btn-add-partner" class="w-full bg-blue-600 text-white font-bold py-2 rounded">UPLOAD</button></div>
+                    <div class="space-y-3"><input id="partner-name" placeholder="Name" class="input-fire"><input id="partner-link" placeholder="Link" class="input-fire"><select id="partner-type" class="input-fire"><option value="Sponsor">Sponsor</option><option value="Partner">Partner</option></select><input type="file" id="partner-logo" class="input-fire text-xs"><button onclick="addPartner()" id="btn-add-partner" class="w-full bg-blue-600 text-white font-bold py-2 rounded">UPLOAD</button></div>
                 </div>
-                <div class="lg:col-span-2 bg-gray-800 p-6 rounded-xl"><div id="partners-list" class="grid grid-cols-3 gap-4"></div></div>
+                <div class="lg:col-span-2 glass-panel p-6 rounded-xl"><div id="partners-list" class="grid grid-cols-3 gap-4"></div></div>
             </div>
         </div>
 
         <div id="tab-settings" class="section hidden max-w-xl mx-auto">
-            <div class="bg-gray-800 p-8 rounded-xl text-center border border-purple-500/30">
+            <div class="glass-panel p-8 rounded-xl text-center border border-purple-500/30">
                 <h2 class="text-2xl font-bold text-white mb-6">SYSTEM SETTINGS</h2>
                 <label class="block text-xs text-gray-400 mb-1 text-left font-bold uppercase">Opening Ceremony Date</label>
-                <input type="datetime-local" id="countdown-date" class="input-dark mb-2 cursor-pointer" onchange="checkDateStatus()">
+                <input type="datetime-local" id="countdown-date" class="input-fire mb-2 cursor-pointer" onchange="checkDateStatus()">
                 <div id="date-status" class="bg-black/50 p-3 rounded text-sm font-mono mb-6 border border-gray-700">Status: ...</div>
                 <button onclick="saveSettings()" class="w-full bg-purple-600 text-white font-bold py-3 rounded text-lg shadow-lg">SAVE SETTINGS</button>
             </div>
@@ -174,30 +181,20 @@
     </div>
 
     <script>
-        // Use 'click' listener to ensure it fires
-        document.getElementById('btn-unlock').addEventListener('click', function() {
+        function handleAdminLogin() {
             const pass = document.getElementById('admin-pass').value;
             // Password: EDUFRESHER26
             if (pass === "EDUFRESHER26") {
+                document.getElementById('auth-box').classList.add('hidden');
                 document.getElementById('login-overlay').classList.add('hidden');
                 document.getElementById('admin-content').classList.remove('hidden');
                 
-                // Try to start Firebase, but don't crash if it fails
-                if (window.initApp) {
-                    window.initApp();
-                } else {
-                    console.warn("Database script not yet loaded or failed.");
-                }
+                // Trigger Database
+                if (window.initApp) window.initApp();
             } else {
-                const msg = document.getElementById('login-msg');
-                msg.classList.remove('hidden');
+                document.getElementById('login-msg').classList.remove('hidden');
             }
-        });
-
-        // Enter key support
-        document.getElementById('admin-pass').addEventListener('keypress', function(e) {
-            if(e.key === 'Enter') document.getElementById('btn-unlock').click();
-        });
+        }
 
         function switchTab(id) {
             document.querySelectorAll('.section').forEach(s => s.classList.add('hidden'));
@@ -211,20 +208,16 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getFirestore, collection, getDocs, doc, setDoc, addDoc, deleteDoc, updateDoc, serverTimestamp, query, orderBy, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-        // Your Config
         const firebaseConfig = { apiKey: "AIzaSyDpkYhtnx7163HgP7IaSy0Uy5lz9DCO-0A", authDomain: "freshers-cup-2026.firebaseapp.com", projectId: "freshers-cup-2026", storageBucket: "freshers-cup-2026.firebasestorage.app", messagingSenderId: "926375023026", appId: "1:926375023026:web:d1ad62dede7425900354ab", measurementId: "G-Z53G2Y9BTM" };
+        const app = initializeApp(firebaseConfig); const db = getFirestore(app);
         const CLOUD_NAME = "dxdxgrvvb"; const UPLOAD_PRESET = "edu_league"; 
-        
-        let app, db;
+
         const depts = [ {id:"AESA",name:"AESA"}, {id:"NAAES",name:"NAAES"}, {id:"EFSA",name:"EFSA"}, {id:"EMSA",name:"EMSA"}, {id:"HKHE",name:"HKHE"}, {id:"ULSESA",name:"ULSESA"}, {id:"SESSA",name:"SESSA"}, {id:"TVESA",name:"TVESA"} ];
         let allFixtures = []; let brandLogos = {};
 
-        // Expose Init to Window
+        // EXPOSE TO WINDOW
         window.initApp = async function() {
             try {
-                app = initializeApp(firebaseConfig);
-                db = getFirestore(app);
-                
                 const list = document.getElementById('dept-list'); const teamSelects = document.querySelectorAll('.team-select'); const fixA = document.getElementById('fix-teamA'); const fixB = document.getElementById('fix-teamB');
                 const baseUrl = window.location.href.replace('admin.html', 'index.html');
                 depts.forEach(d => {
@@ -234,13 +227,13 @@
                 
                 loadStats(); loadPartners(); loadSettings(); loadFixtures(); loadMedalTable(); loadLogoManager(); loadDraws();
                 try { const s = await getDoc(doc(db, "app_content", "brand_logos")); if(s.exists()) brandLogos = s.data(); } catch(e){}
-            } catch(e) { console.error("Firebase Error:", e); alert("Database Error. See Console."); }
+            } catch(e) { console.error("Firebase Error:", e); }
         }
 
-        // --- GLOBAL ADMIN FUNCTIONS ---
+        // GLOBAL ADMIN FUNCS
         window.loadDraws = async () => { const sport = document.getElementById('draw-sport').value; const snap = await getDoc(doc(db, "app_content", `draw_${sport}`)); if (snap.exists()) { const d = snap.data(); const fields = ['grp-a1','grp-a2','grp-b1','grp-b2','grp-c1','grp-c2','grp-d1','grp-d2','sf1-h','sf1-a','sf2-h','sf2-a','fin-h','fin-a']; const keys = ['a1','a2','b1','b2','c1','c2','d1','d2','sf1h','sf1a','sf2h','sf2a','finh','fina']; fields.forEach((id, i) => document.getElementById(id).value = d[keys[i]] || ""); } };
         window.saveDraws = async () => { const sport = document.getElementById('draw-sport').value; const data = { a1: document.getElementById('grp-a1').value, a2: document.getElementById('grp-a2').value, b1: document.getElementById('grp-b1').value, b2: document.getElementById('grp-b2').value, c1: document.getElementById('grp-c1').value, c2: document.getElementById('grp-c2').value, d1: document.getElementById('grp-d1').value, d2: document.getElementById('grp-d2').value, sf1h: document.getElementById('sf1-h').value, sf1a: document.getElementById('sf1-a').value, sf2h: document.getElementById('sf2-h').value, sf2a: document.getElementById('sf2-a').value, finh: document.getElementById('fin-h').value, fina: document.getElementById('fin-a').value }; await setDoc(doc(db, "app_content", `draw_${sport}`), data); alert(`${sport} Bracket Saved!`); };
-        window.loadLogoManager = async () => { const grid = document.getElementById('logo-grid'); const snap = await getDoc(doc(db, "app_content", "dept_logos")); const savedLogos = snap.exists() ? snap.data() : {}; grid.innerHTML = ''; depts.forEach(d => { const currentLogo = savedLogos[d.id] || 'edulogo.jpg'; grid.innerHTML += `<div class="bg-black p-4 rounded-xl border border-gray-700 flex flex-col items-center"><img src="${currentLogo}" id="img-${d.id}" class="h-16 w-16 object-contain mb-3 bg-gray-900 rounded p-1 border border-gray-800"><p class="text-xs font-bold text-gray-400 mb-2">${d.id}</p><input type="file" id="file-${d.id}" class="hidden" accept="image/*" onchange="uploadLogo('${d.id}', 'dept_logos')"><label for="file-${d.id}" class="bg-gray-800 hover:bg-gray-700 text-white text-[10px] font-bold px-4 py-2 rounded cursor-pointer w-full text-center">CHANGE</label></div>`; }); const bSnap = await getDoc(doc(db, "app_content", "brand_logos")); if (bSnap.exists()) { if(bSnap.data().nuesa_logo) document.getElementById('img-nuesa_logo').src = bSnap.data().nuesa_logo; if(bSnap.data().freshers_logo) document.getElementById('img-freshers_logo').src = bSnap.data().freshers_logo; } };
+        window.loadLogoManager = async () => { const grid = document.getElementById('logo-grid'); const snap = await getDoc(doc(db, "app_content", "dept_logos")); const savedLogos = snap.exists() ? snap.data() : {}; grid.innerHTML = ''; depts.forEach(d => { const currentLogo = savedLogos[d.id] || 'edulogo.jpg'; grid.innerHTML += `<div class="bg-black/50 p-4 rounded-xl border border-gray-700 flex flex-col items-center"><img src="${currentLogo}" id="img-${d.id}" class="h-16 w-16 object-contain mb-3 bg-gray-900 rounded p-1 border border-gray-800"><p class="text-xs font-bold text-gray-400 mb-2">${d.id}</p><input type="file" id="file-${d.id}" class="hidden" accept="image/*" onchange="uploadLogo('${d.id}', 'dept_logos')"><label for="file-${d.id}" class="bg-gray-800 hover:bg-gray-700 text-white text-[10px] font-bold px-4 py-2 rounded cursor-pointer w-full text-center">CHANGE</label></div>`; }); const bSnap = await getDoc(doc(db, "app_content", "brand_logos")); if (bSnap.exists()) { if(bSnap.data().nuesa_logo) document.getElementById('img-nuesa_logo').src = bSnap.data().nuesa_logo; if(bSnap.data().freshers_logo) document.getElementById('img-freshers_logo').src = bSnap.data().freshers_logo; } };
         window.uploadLogo = async (id, collectionName) => { const file = document.getElementById(`file-${id}`).files[0]; if(!file)return; const label = document.querySelector(`label[for="file-${id}"]`); label.innerText="..."; const fd = new FormData(); fd.append("file", file); fd.append("upload_preset", UPLOAD_PRESET); try { const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`, {method:"POST", body:fd}); const data = await res.json(); await setDoc(doc(db, "app_content", collectionName), { [id]: data.secure_url }, { merge: true }); document.getElementById(`img-${id}`).src = data.secure_url; label.innerText="DONE"; alert("Updated!"); } catch(e) { label.innerText="RETRY"; } };
         window.downloadFixturesPDF = () => { const { jsPDF } = window.jspdf; const doc = new jsPDF(); const rows = allFixtures.filter(m => m.status === 'Scheduled').map(m => [m.sport, m.stage, `${m.tA} vs ${m.tB}`, new Date(m.date).toLocaleString(), m.venue]); doc.autoTable({ head: [['Sport', 'Stage', 'Match', 'Date', 'Venue']], body: rows, startY: 40 }); doc.save('Fixtures.pdf'); };
         window.downloadResultsPDF = () => { const { jsPDF } = window.jspdf; const doc = new jsPDF(); const rows = allFixtures.filter(m => m.status === 'FT').map(m => [m.sport, m.stage, m.tA, `${m.scoreA} - ${m.scoreB}`, m.tB]); doc.autoTable({ head: [['Sport', 'Stage', 'Home', 'Score', 'Away']], body: rows, startY: 40 }); doc.save('Results.pdf'); };
@@ -258,8 +251,6 @@
         window.checkDateStatus = () => { const val = document.getElementById('countdown-date').value; const statusEl = document.getElementById('date-status'); if (!val) return; const target = new Date(val).getTime(); const diffDays = Math.floor((target - new Date().getTime()) / (1000 * 60 * 60 * 24)); statusEl.innerHTML = diffDays > 10 ? `Status: <span class="text-blue-400 font-bold">ANTICIPATION</span>` : `Status: <span class="text-red-500 font-bold">COUNTDOWN</span>`; }
         window.saveSettings = async () => { await setDoc(doc(db,"app_content","fc_settings"), { countdownTarget: document.getElementById('countdown-date').value }, {merge:true}); alert("Saved"); checkDateStatus(); }
         async function loadSettings() { const s = await getDoc(doc(db,"app_content","fc_settings")); if(s.exists() && s.data().countdownTarget) { document.getElementById('countdown-date').value = s.data().countdownTarget; checkDateStatus(); } }
-        
-        init();
     </script>
 </body>
 </html>
