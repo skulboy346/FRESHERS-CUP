@@ -30,7 +30,7 @@
         <div class="bg-gray-900 p-8 rounded-2xl border border-gray-700 shadow-2xl text-center max-w-sm w-full">
             <i class="fa-solid fa-lock text-4xl text-orange-500 mb-4"></i>
             <h2 class="text-2xl font-bold text-white mb-6">ADMIN ACCESS</h2>
-            <form id="login-form">
+            <form onsubmit="checkLogin(event)">
                 <input type="password" id="admin-pass" class="input-dark mb-4 text-center tracking-widest" placeholder="Authenticate">
                 <button type="submit" class="w-full bg-orange-600 hover:bg-orange-700 text-white font-bold py-3 rounded transition">UNLOCK</button>
             </form>
@@ -172,14 +172,16 @@
         const app = initializeApp(firebaseConfig); const db = getFirestore(app);
         const CLOUD_NAME = "dxdxgrvvb"; const UPLOAD_PRESET = "edu_league"; 
 
-        document.getElementById('login-form').addEventListener('submit', (e) => {
+        // 🔥 GLOBAL LOGIN FUNCTION (Accessible to HTML)
+        window.checkLogin = (e) => {
             e.preventDefault(); const p = document.getElementById('admin-pass').value;
+            // B64 of EDUFRESHER26 is RURVRlJFU0hFUjI2
             if(btoa(p) === "RURVRlJFU0hFUjI2") {
                 document.getElementById('login-overlay').classList.add('hidden');
                 document.getElementById('admin-content').classList.remove('hidden');
                 init();
             } else { alert("ACCESS DENIED"); }
-        });
+        };
 
         const depts = [ {id:"AESA",name:"AESA"}, {id:"NAAES",name:"NAAES"}, {id:"EFSA",name:"EFSA"}, {id:"EMSA",name:"EMSA"}, {id:"HKHE",name:"HKHE"}, {id:"ULSESA",name:"ULSESA"}, {id:"SESSA",name:"SESSA"}, {id:"TVESA",name:"TVESA"} ];
         let allFixtures = []; let brandLogos = {};
