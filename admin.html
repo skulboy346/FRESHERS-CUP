@@ -14,28 +14,15 @@
 
     <style>
         body { font-family: 'Rajdhani', sans-serif; background-color: #0f172a; color: white; }
-        
-        /* Form Elements */
         .input-dark { background: #020617; border: 1px solid #1e293b; padding: 10px; color: white; border-radius: 6px; width: 100%; outline: none; }
         .input-dark:focus { border-color: #f97316; }
-        
-        /* 🔥 FIX: Make Calendar Icon White */
-        input[type="datetime-local"]::-webkit-calendar-picker-indicator {
-            filter: invert(1);
-            cursor: pointer;
-        }
-
-        /* Navigation Tabs */
+        input[type="datetime-local"]::-webkit-calendar-picker-indicator { filter: invert(1); cursor: pointer; }
         .tab-btn { transition: all 0.3s; opacity: 0.6; border-bottom: 3px solid transparent; }
         .tab-btn:hover { opacity: 1; background: rgba(255,255,255,0.05); }
         .tab-btn.active { opacity: 1; border-bottom-color: #f97316; color: #f97316; background: rgba(249, 115, 22, 0.1); }
-        
-        /* Layout & Animation */
         .section { animation: fadeIn 0.3s ease-in-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
         .no-scrollbar::-webkit-scrollbar { display: none; }
-        
-        /* Login Overlay */
         #login-overlay { position: fixed; inset: 0; background: #020617; z-index: 100; display: flex; align-items: center; justify-content: center; }
     </style>
 </head>
@@ -45,15 +32,16 @@
         <div class="bg-gray-900 p-8 rounded-2xl border border-gray-700 shadow-2xl text-center max-w-sm w-full">
             <i class="fa-solid fa-lock text-4xl text-orange-500 mb-4"></i>
             <h2 class="text-2xl font-bold text-white mb-6">ADMIN ACCESS</h2>
-            <form onsubmit="checkLogin(event)">
-                <input type="password" id="admin-pass" class="input-dark mb-4 text-center tracking-widest" placeholder="Authenticate">
+            
+            <form onsubmit="handleLogin(event)">
+                <input type="password" id="admin-pass" class="input-dark mb-4 text-center tracking-widest" placeholder="Password">
                 <button type="submit" class="w-full bg-orange-600 hover:bg-orange-700 text-white font-bold py-3 rounded transition">UNLOCK</button>
             </form>
+            <p id="login-msg" class="text-xs text-red-500 mt-2 hidden">Incorrect Password</p>
         </div>
     </div>
 
     <div id="admin-content" class="hidden">
-        
         <div class="flex justify-between items-center mb-8 border-b border-gray-700 pb-4">
             <h1 class="text-3xl font-bold text-orange-500">MASTER <span class="text-white">CONTROL</span></h1>
             <div class="text-xs text-gray-400">Total Players: <span id="total-count" class="text-green-400 font-bold text-lg">0</span></div>
@@ -142,14 +130,14 @@
 
         <div id="tab-medals" class="section hidden">
             <div class="bg-gray-800 p-6 rounded-xl border border-gray-700">
-                <div class="flex justify-between items-center mb-6"><h3 class="text-xl font-bold text-white flex items-center gap-2"><i class="fa-solid fa-medal text-yellow-500"></i> MEDAL STANDINGS</h3><button onclick="saveMedals()" class="bg-green-600 hover:bg-green-500 text-white px-6 py-2 rounded font-bold transition shadow-lg animate-pulse">SAVE</button></div>
+                <div class="flex justify-between items-center mb-6"><h3 class="text-xl font-bold text-white flex items-center gap-2"><i class="fa-solid fa-medal text-yellow-500"></i> MEDAL STANDINGS</h3><button onclick="saveMedals()" class="bg-green-600 hover:bg-green-500 text-white px-6 py-2 rounded font-bold transition">SAVE</button></div>
                 <div class="overflow-x-auto"><table class="w-full text-left text-sm text-gray-300"><thead class="bg-black text-orange-500 uppercase text-xs"><tr><th class="p-3">Dept</th><th class="p-3 text-center text-yellow-400">🥇</th><th class="p-3 text-center text-gray-300">🥈</th><th class="p-3 text-center text-orange-700">🥉</th></tr></thead><tbody id="medal-table-body" class="divide-y divide-gray-700"></tbody></table></div>
             </div>
         </div>
 
         <div id="tab-logos" class="section hidden">
             <div class="bg-gray-800 p-6 rounded-xl border border-purple-500/30">
-                <h3 class="font-bold text-white mb-4 flex items-center gap-2 text-xl border-b border-gray-700 pb-2"><i class="fa-solid fa-star text-yellow-500"></i> SYSTEM IDENTITY LOGOS</h3>
+                <h3 class="font-bold text-white mb-4 flex items-center gap-2 text-xl border-b border-gray-700 pb-2"><i class="fa-solid fa-star text-yellow-500"></i> SYSTEM IDENTITY</h3>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                     <div class="bg-black p-4 rounded-xl border border-yellow-500/30 flex flex-col items-center"><img id="img-nuesa_logo" src="edulogo.jpg" class="h-20 w-20 object-contain mb-3 bg-white/10 rounded p-1"><p class="text-sm font-bold text-yellow-500 mb-2">NUESA LOGO</p><input type="file" id="file-nuesa_logo" class="hidden" accept="image/*" onchange="uploadLogo('nuesa_logo', 'brand_logos')"><label for="file-nuesa_logo" class="bg-gray-700 hover:bg-gray-600 text-white text-xs font-bold px-4 py-2 rounded cursor-pointer">UPLOAD NUESA</label></div>
                     <div class="bg-black p-4 rounded-xl border border-orange-500/30 flex flex-col items-center"><img id="img-freshers_logo" src="edulogo.jpg" class="h-20 w-20 object-contain mb-3 bg-white/10 rounded p-1"><p class="text-sm font-bold text-orange-500 mb-2">FRESHERS CUP LOGO</p><input type="file" id="file-freshers_logo" class="hidden" accept="image/*" onchange="uploadLogo('freshers_logo', 'brand_logos')"><label for="file-freshers_logo" class="bg-gray-700 hover:bg-gray-600 text-white text-xs font-bold px-4 py-2 rounded cursor-pointer">UPLOAD FRESHERS</label></div>
@@ -180,109 +168,68 @@
         </div>
     </div>
 
+    <script>
+        function handleLogin(event) {
+            event.preventDefault();
+            const pass = document.getElementById('admin-pass').value;
+            // Password: EDUFRESHER26
+            if(pass === "EDUFRESHER26") {
+                document.getElementById('login-overlay').classList.add('hidden');
+                document.getElementById('admin-content').classList.remove('hidden');
+                
+                // Initialize Firebase NOW (Lazy Load)
+                if(window.initFirebase) window.initFirebase();
+            } else {
+                document.getElementById('login-msg').classList.remove('hidden');
+            }
+        }
+
+        function switchTab(id) {
+            document.querySelectorAll('.section').forEach(s => s.classList.add('hidden')); 
+            document.getElementById('tab-'+id).classList.remove('hidden');
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active')); 
+            document.getElementById('btn-'+id).classList.add('active');
+        }
+    </script>
+
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getFirestore, collection, getDocs, doc, setDoc, addDoc, deleteDoc, updateDoc, serverTimestamp, query, orderBy, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-        // --- 1. CONFIGURATION ---
-        const firebaseConfig = {
-            apiKey: "AIzaSyDpkYhtnx7163HgP7IaSy0Uy5lz9DCO-0A",
-            authDomain: "freshers-cup-2026.firebaseapp.com",
-            projectId: "freshers-cup-2026",
-            storageBucket: "freshers-cup-2026.firebasestorage.app",
-            messagingSenderId: "926375023026",
-            appId: "1:926375023026:web:d1ad62dede7425900354ab",
-            measurementId: "G-Z53G2Y9BTM"
-        };
-
-        const CLOUD_NAME = "dxdxgrvvb"; 
-        const UPLOAD_PRESET = "edu_league"; 
+        // CONFIG
+        const firebaseConfig = { apiKey: "AIzaSyDpkYhtnx7163HgP7IaSy0Uy5lz9DCO-0A", authDomain: "freshers-cup-2026.firebaseapp.com", projectId: "freshers-cup-2026", storageBucket: "freshers-cup-2026.firebasestorage.app", messagingSenderId: "926375023026", appId: "1:926375023026:web:d1ad62dede7425900354ab", measurementId: "G-Z53G2Y9BTM" };
+        const CLOUD_NAME = "dxdxgrvvb"; const UPLOAD_PRESET = "edu_league";
+        
         let app, db;
-        let allFixtures = []; 
-        let brandLogos = {};
         const depts = [ {id:"AESA",name:"AESA"}, {id:"NAAES",name:"NAAES"}, {id:"EFSA",name:"EFSA"}, {id:"EMSA",name:"EMSA"}, {id:"HKHE",name:"HKHE"}, {id:"ULSESA",name:"ULSESA"}, {id:"SESSA",name:"SESSA"}, {id:"TVESA",name:"TVESA"} ];
+        let allFixtures = []; let brandLogos = {};
 
-        // --- 2. GLOBAL LOGIN FUNCTION (Attached to Window) ---
-        window.checkLogin = (e) => {
-            if(e) e.preventDefault(); 
-            const pass = document.getElementById('admin-pass').value;
-            // Password: EDUFRESHER26 (Base64 Encoded)
-            if(btoa(pass) === "RURVRlJFU0hFUjI2") {
-                document.getElementById('login-overlay').classList.add('hidden');
-                document.getElementById('admin-content').classList.remove('hidden');
-                startApp(); // Start Firebase only after login
-            } else {
-                alert("❌ ACCESS DENIED");
-            }
-        };
-
-        // --- 3. START APP & LOAD DATA ---
-        async function startApp() {
+        // ATTACH TO WINDOW
+        window.initFirebase = async function() {
             try {
                 app = initializeApp(firebaseConfig);
                 db = getFirestore(app);
-                init();
-            } catch (error) {
-                console.error("Firebase Error:", error);
-                alert("Login Success, but Database Failed. Check Console.");
-            }
-        }
+                
+                // Init Content
+                const list = document.getElementById('dept-list'); const teamSelects = document.querySelectorAll('.team-select'); const fixA = document.getElementById('fix-teamA'); const fixB = document.getElementById('fix-teamB');
+                const baseUrl = window.location.href.replace('admin.html', 'index.html');
+                depts.forEach(d => {
+                    list.innerHTML += `<div class="bg-gray-900 p-2 rounded border border-gray-700 flex justify-between items-center text-xs"><span class="text-orange-500 font-bold">${d.name}</span><button onclick="navigator.clipboard.writeText('${baseUrl}?d=${d.id}').then(()=>alert('Copied!'))" class="bg-gray-700 px-2 py-1 rounded text-white">COPY</button></div>`;
+                    const opt = `<option value="${d.id}">${d.id}</option>`; teamSelects.forEach(s => s.innerHTML += opt); fixA.innerHTML += opt; fixB.innerHTML += opt;
+                });
+                
+                loadStats(); loadPartners(); loadSettings(); loadFixtures(); loadMedalTable(); loadLogoManager(); loadDraws();
+                try { const s = await getDoc(doc(db, "app_content", "brand_logos")); if(s.exists()) brandLogos = s.data(); } catch(e){}
+            } catch(e) { console.error("Firebase Error:", e); alert("Database Error. Check Console."); }
+        };
 
-        async function init() {
-            const list = document.getElementById('dept-list');
-            const teamSelects = document.querySelectorAll('.team-select');
-            const fixA = document.getElementById('fix-teamA');
-            const fixB = document.getElementById('fix-teamB');
-            
-            const baseUrl = window.location.href.replace('admin.html', 'index.html');
-            
-            depts.forEach(d => {
-                list.innerHTML += `<div class="bg-gray-900 p-2 rounded border border-gray-700 flex justify-between items-center text-xs"><span class="text-orange-500 font-bold">${d.name}</span><button onclick="navigator.clipboard.writeText('${baseUrl}?d=${d.id}').then(()=>alert('Copied!'))" class="bg-gray-700 px-2 py-1 rounded text-white">COPY</button></div>`;
-                const opt = `<option value="${d.id}">${d.id}</option>`;
-                teamSelects.forEach(s => s.innerHTML += opt);
-                fixA.innerHTML += opt;
-                fixB.innerHTML += opt;
-            });
-
-            loadStats(); loadPartners(); loadSettings(); loadFixtures(); loadMedalTable(); loadLogoManager(); loadDraws();
-            try { const s = await getDoc(doc(db, "app_content", "brand_logos")); if(s.exists()) brandLogos = s.data(); } catch(e){}
-        }
-
-        // --- 4. TABS & NAVIGATION ---
-        window.switchTab = (id) => {
-            document.querySelectorAll('.section').forEach(s => s.classList.add('hidden')); 
-            document.getElementById(`tab-${id}`).classList.remove('hidden');
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active')); 
-            document.getElementById(`btn-${id}`).classList.add('active');
-        }
-
-        // --- 5. LOGIC FUNCTIONS (Draws, Logos, etc.) ---
+        // EXPORT HELPER FUNCTIONS TO WINDOW
         window.loadDraws = async () => { const sport = document.getElementById('draw-sport').value; const snap = await getDoc(doc(db, "app_content", `draw_${sport}`)); if (snap.exists()) { const d = snap.data(); const fields = ['grp-a1','grp-a2','grp-b1','grp-b2','grp-c1','grp-c2','grp-d1','grp-d2','sf1-h','sf1-a','sf2-h','sf2-a','fin-h','fin-a']; const keys = ['a1','a2','b1','b2','c1','c2','d1','d2','sf1h','sf1a','sf2h','sf2a','finh','fina']; fields.forEach((id, i) => document.getElementById(id).value = d[keys[i]] || ""); } };
         window.saveDraws = async () => { const sport = document.getElementById('draw-sport').value; const data = { a1: document.getElementById('grp-a1').value, a2: document.getElementById('grp-a2').value, b1: document.getElementById('grp-b1').value, b2: document.getElementById('grp-b2').value, c1: document.getElementById('grp-c1').value, c2: document.getElementById('grp-c2').value, d1: document.getElementById('grp-d1').value, d2: document.getElementById('grp-d2').value, sf1h: document.getElementById('sf1-h').value, sf1a: document.getElementById('sf1-a').value, sf2h: document.getElementById('sf2-h').value, sf2a: document.getElementById('sf2-a').value, finh: document.getElementById('fin-h').value, fina: document.getElementById('fin-a').value }; await setDoc(doc(db, "app_content", `draw_${sport}`), data); alert(`${sport} Bracket Saved!`); };
-
-        window.loadLogoManager = async () => {
-            const grid = document.getElementById('logo-grid'); const snap = await getDoc(doc(db, "app_content", "dept_logos")); const savedLogos = snap.exists() ? snap.data() : {};
-            grid.innerHTML = ''; depts.forEach(d => { const currentLogo = savedLogos[d.id] || 'edulogo.jpg'; grid.innerHTML += `<div class="bg-black p-4 rounded-xl border border-gray-700 flex flex-col items-center"><img src="${currentLogo}" id="img-${d.id}" class="h-16 w-16 object-contain mb-3 bg-gray-900 rounded p-1 border border-gray-800"><p class="text-xs font-bold text-gray-400 mb-2">${d.id}</p><input type="file" id="file-${d.id}" class="hidden" accept="image/*" onchange="uploadLogo('${d.id}', 'dept_logos')"><label for="file-${d.id}" class="bg-gray-800 hover:bg-gray-700 text-white text-[10px] font-bold px-4 py-2 rounded cursor-pointer w-full text-center">CHANGE</label></div>`; });
-            const bSnap = await getDoc(doc(db, "app_content", "brand_logos")); 
-            if (bSnap.exists()) { if(bSnap.data().nuesa_logo) document.getElementById('img-nuesa_logo').src = bSnap.data().nuesa_logo; if(bSnap.data().freshers_logo) document.getElementById('img-freshers_logo').src = bSnap.data().freshers_logo; }
-        };
-
-        window.uploadLogo = async (id, collectionName) => {
-            const file = document.getElementById(`file-${id}`).files[0]; if(!file)return;
-            const label = document.querySelector(`label[for="file-${id}"]`); label.innerText="...";
-            const fd = new FormData(); fd.append("file", file); fd.append("upload_preset", UPLOAD_PRESET);
-            try { const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`, {method:"POST", body:fd}); const data = await res.json(); await setDoc(doc(db, "app_content", collectionName), { [id]: data.secure_url }, { merge: true }); document.getElementById(`img-${id}`).src = data.secure_url; label.innerText="DONE"; alert("Updated!"); } catch(e) { label.innerText="RETRY"; }
-        };
-
-        const addPDFHeader = (doc, title) => {
-            doc.setFillColor(0, 0, 0); doc.rect(0, 0, 210, 30, 'F'); doc.setTextColor(255, 255, 255); doc.setFontSize(18); doc.setFont("helvetica", "bold"); doc.text(title, 105, 20, { align: 'center' });
-            if(brandLogos.nuesa_logo) { try { doc.addImage(brandLogos.nuesa_logo, 'JPEG', 10, 5, 20, 20); } catch(e){} }
-            if(brandLogos.freshers_logo) { try { doc.addImage(brandLogos.freshers_logo, 'JPEG', 180, 5, 20, 20); } catch(e){} }
-        };
-
-        window.downloadFixturesPDF = () => { const { jsPDF } = window.jspdf; const doc = new jsPDF(); addPDFHeader(doc, "FIXTURES LIST"); const rows = allFixtures.filter(m => m.status === 'Scheduled').map(m => [m.sport, m.stage, `${m.tA} vs ${m.tB}`, new Date(m.date).toLocaleString(), m.venue]); doc.autoTable({ head: [['Sport', 'Stage', 'Match', 'Date', 'Venue']], body: rows, startY: 40 }); doc.save('Fixtures.pdf'); };
-        window.downloadResultsPDF = () => { const { jsPDF } = window.jspdf; const doc = new jsPDF(); addPDFHeader(doc, "MATCH RESULTS"); const rows = allFixtures.filter(m => m.status === 'FT').map(m => [m.sport, m.stage, m.tA, `${m.scoreA} - ${m.scoreB}`, m.tB]); doc.autoTable({ head: [['Sport', 'Stage', 'Home', 'Score', 'Away']], body: rows, startY: 40 }); doc.save('Results.pdf'); };
-
+        window.loadLogoManager = async () => { const grid = document.getElementById('logo-grid'); const snap = await getDoc(doc(db, "app_content", "dept_logos")); const savedLogos = snap.exists() ? snap.data() : {}; grid.innerHTML = ''; depts.forEach(d => { const currentLogo = savedLogos[d.id] || 'edulogo.jpg'; grid.innerHTML += `<div class="bg-black p-4 rounded-xl border border-gray-700 flex flex-col items-center"><img src="${currentLogo}" id="img-${d.id}" class="h-16 w-16 object-contain mb-3 bg-gray-900 rounded p-1 border border-gray-800"><p class="text-xs font-bold text-gray-400 mb-2">${d.id}</p><input type="file" id="file-${d.id}" class="hidden" accept="image/*" onchange="uploadLogo('${d.id}', 'dept_logos')"><label for="file-${d.id}" class="bg-gray-800 hover:bg-gray-700 text-white text-[10px] font-bold px-4 py-2 rounded cursor-pointer w-full text-center">CHANGE</label></div>`; }); const bSnap = await getDoc(doc(db, "app_content", "brand_logos")); if (bSnap.exists()) { if(bSnap.data().nuesa_logo) document.getElementById('img-nuesa_logo').src = bSnap.data().nuesa_logo; if(bSnap.data().freshers_logo) document.getElementById('img-freshers_logo').src = bSnap.data().freshers_logo; } };
+        window.uploadLogo = async (id, collectionName) => { const file = document.getElementById(`file-${id}`).files[0]; if(!file)return; const label = document.querySelector(`label[for="file-${id}"]`); label.innerText="..."; const fd = new FormData(); fd.append("file", file); fd.append("upload_preset", UPLOAD_PRESET); try { const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`, {method:"POST", body:fd}); const data = await res.json(); await setDoc(doc(db, "app_content", collectionName), { [id]: data.secure_url }, { merge: true }); document.getElementById(`img-${id}`).src = data.secure_url; label.innerText="DONE"; alert("Updated!"); } catch(e) { label.innerText="RETRY"; } };
+        window.downloadFixturesPDF = () => { const { jsPDF } = window.jspdf; const doc = new jsPDF(); const rows = allFixtures.filter(m => m.status === 'Scheduled').map(m => [m.sport, m.stage, `${m.tA} vs ${m.tB}`, new Date(m.date).toLocaleString(), m.venue]); doc.autoTable({ head: [['Sport', 'Stage', 'Match', 'Date', 'Venue']], body: rows, startY: 40 }); doc.save('Fixtures.pdf'); };
+        window.downloadResultsPDF = () => { const { jsPDF } = window.jspdf; const doc = new jsPDF(); const rows = allFixtures.filter(m => m.status === 'FT').map(m => [m.sport, m.stage, m.tA, `${m.scoreA} - ${m.scoreB}`, m.tB]); doc.autoTable({ head: [['Sport', 'Stage', 'Home', 'Score', 'Away']], body: rows, startY: 40 }); doc.save('Results.pdf'); };
         window.loadMedalTable = async () => { const tableBody = document.getElementById('medal-table-body'); const snap = await getDoc(doc(db, "app_content", "medal_table")); let medalData = snap.exists() ? snap.data() : {}; tableBody.innerHTML = ''; depts.forEach(d => { const m = medalData[d.id] || {g:0, s:0, b:0}; tableBody.innerHTML += `<tr class="dept-medal-row" data-id="${d.id}"><td class="p-3 font-bold text-white">${d.name}</td><td class="p-3 text-center"><input type="number" min="0" value="${m.g}" class="w-16 bg-black border border-yellow-600 rounded text-center text-yellow-400 font-bold medal-g"></td><td class="p-3 text-center"><input type="number" min="0" value="${m.s}" class="w-16 bg-black border border-gray-500 rounded text-center text-gray-300 font-bold medal-s"></td><td class="p-3 text-center"><input type="number" min="0" value="${m.b}" class="w-16 bg-black border border-orange-800 rounded text-center text-orange-600 font-bold medal-b"></td></tr>`; }); };
         window.saveMedals = async () => { const rows = document.querySelectorAll('.dept-medal-row'); let data = {}; rows.forEach(r => { data[r.dataset.id] = { g: parseInt(r.querySelector('.medal-g').value)||0, s: parseInt(r.querySelector('.medal-s').value)||0, b: parseInt(r.querySelector('.medal-b').value)||0 }; }); await setDoc(doc(db, "app_content", "medal_table"), data); alert("Saved!"); };
         window.addFixture = async () => { const sport = document.getElementById('fix-sport').value; const stage = document.getElementById('fix-stage').value; const tA = document.getElementById('fix-teamA').value; const tB = document.getElementById('fix-teamB').value; const date = document.getElementById('fix-date').value; const venue = document.getElementById('fix-venue').value; if(!tA || !tB || tA === tB || !date) return alert("Check inputs!"); await addDoc(collection(db, "fc_fixtures"), { sport, stage, tA, tB, date, venue, scoreA: null, scoreB: null, status: "Scheduled", timestamp: serverTimestamp() }); alert("Match Created!"); loadFixtures(); };
