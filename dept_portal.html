@@ -65,24 +65,29 @@
         <p class="text-center text-gray-500 text-xs mt-6 font-bold tracking-widest">POWERED BY NUESA SPORTS COMMITTEE</p>
     </div>
 
-    <script type="module">
+<script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getFirestore, collection, getDocs, query, where, orderBy, addDoc, serverTimestamp, getDoc, doc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
+        // CONFIG
         const firebaseConfig = { apiKey: "AIzaSyDpkYhtnx7163HgP7IaSy0Uy5lz9DCO-0A", authDomain: "freshers-cup-2026.firebaseapp.com", projectId: "freshers-cup-2026", storageBucket: "freshers-cup-2026.firebasestorage.app", messagingSenderId: "926375023026", appId: "1:926375023026:web:d1ad62dede7425900354ab", measurementId: "G-Z53G2Y9BTM" };
         const app = initializeApp(firebaseConfig); const db = getFirestore(app);
 
-        // 🔥 HASHED ACCESS CODES (Secure)
-        const validHashes = {
-            "AESA": "QUVTQS0yNg==", "NAAES": "TkFBRVMtMjY=", "EFSA": "RUZTQS0yNg==",
-            "EMSA": "RU1TQS0yNg==", "HKHE": "SEtHRS0yNg==", "ULSESA": "VUxTRVNBLTI2",
-            "SESSA": "U0VTU0EtMjY=", "TVESA": "VFZFU0EtMjY="
+        // 🔥 SIMPLIFIED CODES (Letters & Numbers Only - No Dashes needed in check)
+        const ACCESS_CODES = {
+            "AESA": "AESA26",
+            "NAAES": "NAAES26",
+            "EFSA": "EFSA26",
+            "EMSA": "EMSA26",
+            "HKHE": "HKHE26",
+            "ULSESA": "ULSESA26",
+            "SESSA": "SESSA26",
+            "TVESA": "TVESA26"
         };
         const nameMap = { "AESA": "Adult Education", "NAAES": "Arts Education", "EFSA": "Educational Foundations", "EMSA": "Educational Management", "HKHE": "Human Kinetics", "ULSESA": "Science Education", "SESSA": "Social Sciences", "TVESA": "Vocational Edu" };
 
         let isSignup = false; let squadData = []; let currentDeptName = ""; let brandLogos = {};
 
-        // Load Brand Logos for PDF
         (async () => { try { const s = await getDoc(doc(db, "app_content", "brand_logos")); if(s.exists()) brandLogos = s.data(); } catch(e){} })();
 
         window.toggleMode = (mode) => {
@@ -93,14 +98,35 @@
         }
 
         window.handleAuth = async (e) => {
-            e.preventDefault(); const dept = document.getElementById('auth-dept').value; const code = document.getElementById('auth-code').value.trim().toUpperCase(); const btn = document.getElementById('auth-btn');
+            e.preventDefault(); 
+            const dept = document.getElementById('auth-dept').value; 
+            const rawCode = document.getElementById('auth-code').value;
+            
+            // 🔥 CLEANER: Remove all spaces and dashes, force Uppercase
+            // Example: "HKHE-26" becomes "HKHE26"
+            const cleanCode = rawCode.toUpperCase().replace(/[^A-Z0-9]/g, ''); 
+            const btn = document.getElementById('auth-btn');
+
             if (!dept) return alert("Please select your department."); 
             
-            // Check Hash instead of raw string
-            if (btoa(code) !== validHashes[dept]) return alert("❌ Invalid Access Code.");
+            // Check against clean codes
+            const correctCleanCode = ACCESS_CODES[dept];
+            
+            if (cleanCode !== correctCleanCode) {
+                // Show them exactly what we expected vs what we got (for debugging)
+                return alert(`❌ INVALID CODE!\n\nYou Selected: ${dept}\nWe Read: ${cleanCode}\nExpected: ${correctCleanCode}\n\n(Tip: Just type letters and numbers, e.g. HKHE26)`);
+            }
 
             btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> VERIFYING...';
-            if (isSignup) { const name = document.getElementById('auth-name').value; try { await addDoc(collection(db, "sport_secs_26"), { fullname: name, department: dept, code_used: "VERIFIED", timestamp: serverTimestamp() }); loadDashboard(dept, name); } catch (err) { console.error(err); alert("Error registering. Check connection."); btn.disabled = false; btn.innerText = "REGISTER SPORT SEC"; } } 
+            if (isSignup) { 
+                const name = document.getElementById('auth-name').value; 
+                try { 
+                    await addDoc(collection(db, "sport_secs_26"), { fullname: name, department: dept, code_used: rawCode, timestamp: serverTimestamp() }); 
+                    loadDashboard(dept, name); 
+                } catch (err) { 
+                    console.error(err); alert("Error registering. Check connection."); btn.disabled = false; btn.innerText = "REGISTER SPORT SEC"; 
+                } 
+            } 
             else { loadDashboard(dept, "Sport Secretary"); }
         }
 
