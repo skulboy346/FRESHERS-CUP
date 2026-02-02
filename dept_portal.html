@@ -4,18 +4,23 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Squad Portal - Freshers Cup '26</title>
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+
     <style>
         body { font-family: 'Rajdhani', sans-serif; background-color: #000; color: white; }
         .font-cyber { font-family: 'Orbitron', sans-serif; }
-        .text-fire { background: -webkit-linear-gradient(#f59e0b, #ef4444); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        
+        /* Glass Design */
         .glass-panel { background: rgba(17, 24, 39, 0.9); backdrop-filter: blur(12px); border: 1px solid rgba(249, 115, 22, 0.3); box-shadow: 0 0 20px rgba(0,0,0,0.5); }
         .input-fire { background: rgba(0,0,0,0.6); border: 1px solid #333; color: white; transition: all 0.3s ease; }
         .input-fire:focus { border-color: #f59e0b; outline: none; box-shadow: 0 0 15px rgba(245, 158, 11, 0.3); }
+        
+        /* Animation */
         .fade-in { animation: fadeIn 0.5s ease-in-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
@@ -25,7 +30,7 @@
     <div class="absolute inset-0 bg-black/90 z-0"></div>
 
     <div id="auth-box" class="relative z-10 glass-panel p-8 rounded-2xl w-full max-w-sm text-center fade-in">
-        <div class="mb-6"><i class="fa-solid fa-user-shield text-5xl text-orange-500 mb-2 drop-shadow-lg"></i><h1 class="text-3xl font-black font-cyber italic tracking-wider">PORTAL <span class="text-fire">ACCESS</span></h1></div>
+        <div class="mb-6"><i class="fa-solid fa-user-shield text-5xl text-orange-500 mb-2 drop-shadow-lg"></i><h1 class="text-3xl font-black font-cyber italic tracking-wider">PORTAL <span class="text-orange-500">ACCESS</span></h1></div>
         
         <div class="flex justify-center mb-6">
             <div class="relative inline-block w-48 bg-gray-900 rounded-full p-1 border border-gray-700 flex">
@@ -37,12 +42,20 @@
         <form id="authForm" class="space-y-4" onsubmit="handleAuth(event)">
             <div class="text-left"><label class="text-[10px] font-bold text-gray-400 uppercase ml-1">Select Department</label>
                 <select id="auth-dept" required class="w-full p-3 rounded-xl input-fire text-sm font-bold text-gray-300">
-                    <option value="">-- Choose Department --</option><option value="AESA">Arts Education (AESA)</option><option value="NAAES">Adult Education (NAAES)</option><option value="EFSA">Educational Foundations (EFSA)</option><option value="EMSA">Educational Management (EMSA)</option><option value="HKHE">Human Kinetics (HKHE)</option><option value="ULSESA">Science Education (ULSESA)</option><option value="SESSA">Social Sciences (SESSA)</option><option value="TVESA">Technology and Vocational Edu (TVESA)</option>
+                    <option value="">-- Choose Department --</option>
+                    <option value="AESA">Adult Education (AESA)</option>
+                    <option value="NAAES">Arts Education (NAAES)</option>
+                    <option value="EFSA">Educational Foundations (EFSA)</option>
+                    <option value="EMSA">Educational Management (EMSA)</option>
+                    <option value="HKHE">Human Kinetics (HKHE)</option>
+                    <option value="ULSESA">Science Education (ULSESA)</option>
+                    <option value="SESSA">Social Sciences (SESSA)</option>
+                    <option value="TVESA">Vocational Edu (TVESA)</option>
                 </select>
             </div>
             <div id="name-field" class="text-left hidden"><label class="text-[10px] font-bold text-gray-400 uppercase ml-1">Full Name</label><input id="auth-name" type="text" placeholder="Sports Secretary Name" class="w-full p-3 rounded-xl input-fire text-sm font-bold placeholder-gray-600"></div>
             <div class="text-left"><label class="text-[10px] font-bold text-gray-400 uppercase ml-1">Access Code</label><input id="auth-code" type="password" required placeholder="••••••••" class="w-full p-3 rounded-xl input-fire text-center text-lg font-bold tracking-widest placeholder-gray-600"></div>
-            <button type="submit" id="auth-btn" class="w-full bg-gradient-to-r from-orange-600 to-red-600 text-white font-black py-4 rounded-xl text-lg hover:scale-[1.02] transition shadow-lg btn-fire font-cyber mt-2">ACCESS PORTAL</button>
+            <button type="submit" id="auth-btn" class="w-full bg-gradient-to-r from-orange-600 to-red-600 text-white font-black py-4 rounded-xl text-lg hover:scale-[1.02] transition shadow-lg mt-2 font-cyber">ACCESS PORTAL</button>
         </form>
     </div>
 
@@ -60,87 +73,88 @@
         </div>
 
         <div class="glass-panel rounded-xl overflow-hidden">
-            <div class="overflow-x-auto"><table class="w-full text-left text-sm text-gray-300"><thead class="bg-gradient-to-r from-orange-900/80 to-red-900/80 text-white uppercase text-xs font-cyber tracking-wider"><tr><th class="p-5">Name</th><th class="p-5">Role</th><th class="p-5">Ball Game</th><th class="p-5">Board Games</th><th class="p-5 text-right">Contact</th></tr></thead><tbody id="roster-body" class="divide-y divide-gray-800/50"></tbody></table></div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-sm text-gray-300">
+                    <thead class="bg-gradient-to-r from-orange-900/80 to-red-900/80 text-white uppercase text-xs font-cyber tracking-wider"><tr><th class="p-5">Name</th><th class="p-5">Role</th><th class="p-5">Ball Game</th><th class="p-5">Board Games</th><th class="p-5 text-right">Contact</th></tr></thead>
+                    <tbody id="roster-body" class="divide-y divide-gray-800/50"></tbody>
+                </table>
+            </div>
         </div>
         <p class="text-center text-gray-500 text-xs mt-6 font-bold tracking-widest">POWERED BY NUESA SPORTS COMMITTEE</p>
     </div>
 
-<script type="module">
+    <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getFirestore, collection, getDocs, query, where, orderBy, addDoc, serverTimestamp, getDoc, doc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-        // CONFIG
         const firebaseConfig = { apiKey: "AIzaSyDpkYhtnx7163HgP7IaSy0Uy5lz9DCO-0A", authDomain: "freshers-cup-2026.firebaseapp.com", projectId: "freshers-cup-2026", storageBucket: "freshers-cup-2026.firebasestorage.app", messagingSenderId: "926375023026", appId: "1:926375023026:web:d1ad62dede7425900354ab", measurementId: "G-Z53G2Y9BTM" };
         const app = initializeApp(firebaseConfig); const db = getFirestore(app);
 
-        // 🔥 SIMPLIFIED CODES (Letters & Numbers Only - No Dashes needed in check)
-        const ACCESS_CODES = {
-            "AESA": "AESA26",
-            "NAAES": "NAAES26",
-            "EFSA": "EFSA26",
-            "EMSA": "EMSA26",
-            "HKHE": "HKHE26",
-            "ULSESA": "ULSESA26",
-            "SESSA": "SESSA26",
-            "TVESA": "TVESA26"
-        };
+        // ✅ FORGIVING CODE CHECK (No dashes needed)
+        const ACCESS_CODES = { "AESA":"AESA26", "NAAES":"NAAES26", "EFSA":"EFSA26", "EMSA":"EMSA26", "HKHE":"HKHE26", "ULSESA":"ULSESA26", "SESSA":"SESSA26", "TVESA":"TVESA26" };
         const nameMap = { "AESA": "Adult Education", "NAAES": "Arts Education", "EFSA": "Educational Foundations", "EMSA": "Educational Management", "HKHE": "Human Kinetics", "ULSESA": "Science Education", "SESSA": "Social Sciences", "TVESA": "Vocational Edu" };
 
         let isSignup = false; let squadData = []; let currentDeptName = ""; let brandLogos = {};
 
+        // Load Brand Logos for PDF
         (async () => { try { const s = await getDoc(doc(db, "app_content", "brand_logos")); if(s.exists()) brandLogos = s.data(); } catch(e){} })();
 
         window.toggleMode = (mode) => {
             isSignup = (mode === 'signup');
-            const btnLogin = document.getElementById('btn-mode-login'); const btnSignup = document.getElementById('btn-mode-signup'); const nameField = document.getElementById('name-field'); const authBtn = document.getElementById('auth-btn');
-            if(isSignup) { btnLogin.className = "w-1/2 py-1 rounded-full text-xs font-bold text-gray-400 hover:text-white transition-all"; btnSignup.className = "w-1/2 py-1 rounded-full text-xs font-bold text-white bg-orange-600 transition-all"; nameField.classList.remove('hidden'); document.getElementById('auth-name').required = true; authBtn.innerText = "REGISTER SPORT SEC"; } 
-            else { btnSignup.className = "w-1/2 py-1 rounded-full text-xs font-bold text-gray-400 hover:text-white transition-all"; btnLogin.className = "w-1/2 py-1 rounded-full text-xs font-bold text-white bg-orange-600 transition-all"; nameField.classList.add('hidden'); document.getElementById('auth-name').required = false; authBtn.innerText = "ACCESS PORTAL"; }
+            document.getElementById('btn-mode-login').className = isSignup ? "w-1/2 py-1 rounded-full text-xs font-bold text-gray-400 hover:text-white transition-all" : "w-1/2 py-1 rounded-full text-xs font-bold text-white bg-orange-600 transition-all";
+            document.getElementById('btn-mode-signup').className = isSignup ? "w-1/2 py-1 rounded-full text-xs font-bold text-white bg-orange-600 transition-all" : "w-1/2 py-1 rounded-full text-xs font-bold text-gray-400 hover:text-white transition-all";
+            document.getElementById('name-field').classList.toggle('hidden', !isSignup);
+            document.getElementById('auth-name').required = isSignup;
+            document.getElementById('auth-btn').innerText = isSignup ? "REGISTER SPORT SEC" : "ACCESS PORTAL";
         }
 
         window.handleAuth = async (e) => {
             e.preventDefault(); 
             const dept = document.getElementById('auth-dept').value; 
             const rawCode = document.getElementById('auth-code').value;
-            
-            // 🔥 CLEANER: Remove all spaces and dashes, force Uppercase
-            // Example: "HKHE-26" becomes "HKHE26"
-            const cleanCode = rawCode.toUpperCase().replace(/[^A-Z0-9]/g, ''); 
+            const cleanCode = rawCode.toUpperCase().replace(/[^A-Z0-9]/g, ''); // Removes space & dash
             const btn = document.getElementById('auth-btn');
 
             if (!dept) return alert("Please select your department."); 
             
-            // Check against clean codes
-            const correctCleanCode = ACCESS_CODES[dept];
-            
-            if (cleanCode !== correctCleanCode) {
-                // Show them exactly what we expected vs what we got (for debugging)
-                return alert(`❌ INVALID CODE!\n\nYou Selected: ${dept}\nWe Read: ${cleanCode}\nExpected: ${correctCleanCode}\n\n(Tip: Just type letters and numbers, e.g. HKHE26)`);
-            }
+            if (cleanCode !== ACCESS_CODES[dept]) return alert(`❌ INVALID CODE!\nSelected: ${dept}\nExpected: ${ACCESS_CODES[dept]} (or ${ACCESS_CODES[dept].replace('26','-26')})`);
 
             btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> VERIFYING...';
+            
             if (isSignup) { 
                 const name = document.getElementById('auth-name').value; 
                 try { 
                     await addDoc(collection(db, "sport_secs_26"), { fullname: name, department: dept, code_used: rawCode, timestamp: serverTimestamp() }); 
                     loadDashboard(dept, name); 
-                } catch (err) { 
-                    console.error(err); alert("Error registering. Check connection."); btn.disabled = false; btn.innerText = "REGISTER SPORT SEC"; 
-                } 
-            } 
-            else { loadDashboard(dept, "Sport Secretary"); }
+                } catch (err) { console.error(err); alert("Error registering."); btn.disabled = false; btn.innerText = "REGISTER SPORT SEC"; } 
+            } else { 
+                loadDashboard(dept, "Sport Secretary"); 
+            }
         }
 
         async function loadDashboard(deptId, secName) {
             document.getElementById('auth-box').classList.add('hidden'); document.getElementById('dashboard').classList.remove('hidden');
             currentDeptName = nameMap[deptId]; document.getElementById('dept-title').innerText = currentDeptName; if(secName !== "Sport Secretary") document.getElementById('sec-name-display').innerText = `Welcome, ${secName}`;
             const currentUrl = window.location.href; const baseUrl = currentUrl.substring(0, currentUrl.lastIndexOf('/')) + '/index.html'; const regLink = `${baseUrl}?d=${deptId}`; document.getElementById('share-link').value = regLink;
-            const q = query(collection(db, "fresher_cup_26"), where("deptId", "==", deptId), orderBy("timestamp", "desc")); const snap = await getDocs(q); const tbody = document.getElementById('roster-body'); tbody.innerHTML = ""; squadData = [];
-            snap.forEach(doc => { const d = doc.data(); squadData.push([d.fullname, d.role, d.ballGame, d.boardGames.join(', '), d.phone]); const roleColor = d.role === 'Coach' ? 'bg-red-900/50 text-red-200 border-red-700' : 'bg-gray-800 text-gray-300 border-gray-600'; const sportColor = d.ballGame !== 'None' ? 'text-orange-400 font-bold' : 'text-gray-500'; tbody.innerHTML += `<tr class="hover:bg-white/5 transition duration-200"><td class="p-5 font-bold text-white text-lg">${d.fullname}</td><td class="p-5"><span class="${roleColor} px-3 py-1 rounded text-xs border font-bold uppercase tracking-wider">${d.role}</span></td><td class="p-5 ${sportColor}">${d.ballGame}</td><td class="p-5 text-yellow-400 font-medium">${d.boardGames.join(', ') || '-'}</td><td class="p-5 text-right font-mono text-sm text-green-400"><a href="https://wa.me/${d.phone}" target="_blank" class="hover:underline"><i class="fa-brands fa-whatsapp mr-1"></i>${d.phone}</a></td></tr>`; });
+            
+            // 🔥 FIXED QUERY: REMOVED "orderBy" TO FIX BLANK DATA/PDF
+            const q = query(collection(db, "fresher_cup_26"), where("deptId", "==", deptId)); 
+            
+            const snap = await getDocs(q); const tbody = document.getElementById('roster-body'); tbody.innerHTML = ""; squadData = [];
+            snap.forEach(doc => { 
+                const d = doc.data(); 
+                squadData.push([d.fullname, d.role, d.ballGame, d.boardGames.join(', '), d.phone]); 
+                const roleColor = d.role === 'Coach' ? 'bg-red-900/50 text-red-200 border-red-700' : 'bg-gray-800 text-gray-300 border-gray-600'; 
+                const sportColor = d.ballGame !== 'None' ? 'text-orange-400 font-bold' : 'text-gray-500'; 
+                tbody.innerHTML += `<tr class="hover:bg-white/5 transition duration-200"><td class="p-5 font-bold text-white text-lg">${d.fullname}</td><td class="p-5"><span class="${roleColor} px-3 py-1 rounded text-xs border font-bold uppercase tracking-wider">${d.role}</span></td><td class="p-5 ${sportColor}">${d.ballGame}</td><td class="p-5 text-yellow-400 font-medium">${d.boardGames.join(', ') || '-'}</td><td class="p-5 text-right font-mono text-sm text-green-400"><a href="https://wa.me/${d.phone}" target="_blank" class="hover:underline"><i class="fa-brands fa-whatsapp mr-1"></i>${d.phone}</a></td></tr>`; 
+            });
             if(snap.empty) tbody.innerHTML = '<tr><td colspan="5" class="p-10 text-center text-gray-500 font-bold tracking-widest">NO REGISTRATIONS FOUND YET.</td></tr>';
         }
 
-        window.copyShareLink = () => { const copyText = document.getElementById("share-link"); copyText.select(); copyText.setSelectionRange(0, 99999); try { navigator.clipboard.writeText(copyText.value).then(() => alert("Link Copied!")); } catch (err) { document.execCommand("copy"); alert("Link Copied!"); } }
+        window.copyShareLink = () => { const copyText = document.getElementById("share-link"); copyText.select(); try { navigator.clipboard.writeText(copyText.value).then(() => alert("Link Copied!")); } catch (err) { document.execCommand("copy"); alert("Link Copied!"); } }
+        
         window.downloadPDF = () => { 
+            if(squadData.length === 0) return alert("No players to export!");
             const { jsPDF } = window.jspdf; const doc = new jsPDF(); 
             doc.setFillColor(255, 69, 0); doc.rect(0, 0, 210, 30, 'F'); doc.setTextColor(255, 255, 255); doc.setFontSize(16); doc.setFont("helvetica", "bold"); doc.text(`${currentDeptName.toUpperCase()} - SQUAD ROSTER`, 105, 20, { align: 'center' });
             if(brandLogos.nuesa_logo) { try { doc.addImage(brandLogos.nuesa_logo, 'JPEG', 10, 5, 20, 20); } catch(e){} }
